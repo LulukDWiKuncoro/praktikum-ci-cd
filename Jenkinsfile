@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_REPO = 'cihuahuahua/java-maven-app'  
+        DOCKER_HUB_REPO = 'cihuahuahua/java-maven-app'
     }
 
     stages {
@@ -30,4 +30,21 @@ pipeline {
 
         stage('Login to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_U_]()
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    bat '''
+                    docker login -u %DOCKER_USER% -p %DOCKER_PASS%
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                bat '''
+                docker tag %DOCKER_HUB_REPO%:1.0 %DOCKER_HUB_REPO%:1.0
+                docker push %DOCKER_HUB_REPO%:1.0
+                '''
+            }
+        }
+    }
+}
